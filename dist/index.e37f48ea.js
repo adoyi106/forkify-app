@@ -623,6 +623,7 @@ const controlPagination = function(goToPage) {
 const controlServings = function(newServings) {
     //update recipe servings
     _modelJs.updateServings(newServings);
+    // model.updateServings(model.state.recipe, newServings);
     //render new recipe view
     (0, _recipeViewJsDefault.default).render(_modelJs.state.recipe);
 };
@@ -2050,19 +2051,28 @@ const loadRecipe = async function(id) {
     try {
         const data = await (0, _helpersJs.getJSON)(`${(0, _configJs.API_URL)}${id}`);
         const { recipe  } = data.data;
-        console.log(recipe);
+        // console.log('star', recipe);
         state.recipe = {
+            // id: recipe.id,
+            // title: recipe.title,
+            // publisher: recipe.publisher,
+            // ingredients: recipe.ingredients,
+            // imageUrl: recipe.image_url,
+            // servings: recipe.servings,
+            // cookingTime: recipe.cooking_time,
+            // sourceUrl: recipe.source_url,
             id: recipe.id,
             title: recipe.title,
             publisher: recipe.publisher,
-            ingredients: recipe.ingredients,
-            imageUrl: recipe.image_url,
+            sourceUrl: recipe.source_url,
+            image: recipe.image_url,
             servings: recipe.servings,
             cookingTime: recipe.cooking_time,
-            sourceUrl: recipe.source_url
+            ingredients: recipe.ingredients
         };
-        console.log(state.recipe);
-        console.log(state.recipe.servings);
+        console.log("\uD83D\uDCA5\uD83D\uDD25\uD83D\uDCA5\uD83D\uDD25", state.recipe);
+        console.log("♟♟", state.recipe.servings);
+        console.log("♟♟", state);
     } catch (err) {
         // console.error(`${err} 💥💥`);
         throw err;
@@ -2098,8 +2108,24 @@ const updateServings = function(newServings) {
         ing.quantity = ing.quantity * newServings / state.recipe.servings;
     //newQty = oldQty * newQty/oldServings
     });
+    console.log(state.recipe.servings);
     state.recipe.servings = newServings;
-// console.log(state.recipe.servings);
+// const obj = {
+//   ...state.recipe,
+//   ingredients: state.recipe.ingredients.map(ing => ({
+//     ...ing,
+//     quantity: (ing.quantity * newServings) / state.recipe.servings,
+//   })),
+//   servings: newServings,
+// };
+// // obj.recipe.servings = newServings;
+// const updatedState = {
+//   ...state,
+//   recipe: obj,
+// };
+// console.log(obj);
+// return updatedState;
+//   // console.log(state.recipe.servings);
 };
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","regenerator-runtime":"dXNgZ","./config.js":"k5Hzs","./helpers.js":"hGI1E"}],"gkKU3":[function(require,module,exports) {
@@ -2790,7 +2816,7 @@ var _viewJs = require("./View.js");
 var _viewJsDefault = parcelHelpers.interopDefault(_viewJs);
 class RecipeView extends (0, _viewJsDefault.default) {
     _parentElement = document.querySelector(".recipe");
-    // _data;
+    _data;
     _errorMessage = "We could not find that recipe. Please try another one!";
     _message = "";
     addHandlerRender(handler) {
@@ -2800,17 +2826,17 @@ class RecipeView extends (0, _viewJsDefault.default) {
         ].forEach((ev)=>window.addEventListener(ev, handler));
     }
     addHandlerUpdateServings(handler) {
-        console.log(this._data);
         this._parentElement.addEventListener("click", function(e) {
             const btn = e.target.closest(".btn--update-servings");
             if (!btn) return;
             console.log(btn);
             const updateTo = +btn.dataset.updateTo;
             console.log(updateTo);
-            handler();
+            handler(updateTo);
         });
     }
     _generateMarkup() {
+        // console.log(this._data);
         return `
     <figure class="recipe__fig">
     <img src=${this._data.imageUrl} alt="Tomato" class="recipe__img" />

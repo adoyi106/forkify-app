@@ -4,26 +4,27 @@ import View from './View.js';
 
 class RecipeView extends View {
   _parentElement = document.querySelector('.recipe');
-  // _data;
+  _data;
   _errorMessage = 'We could not find that recipe. Please try another one!';
   _message = '';
 
   addHandlerRender(handler) {
     ['hashchange', 'load'].forEach(ev => window.addEventListener(ev, handler));
   }
+
   addHandlerUpdateServings(handler) {
-    console.log(this._data);
     this._parentElement.addEventListener('click', function (e) {
       const btn = e.target.closest('.btn--update-servings');
       if (!btn) return;
       console.log(btn);
       const updateTo = +btn.dataset.updateTo;
       console.log(updateTo);
-      handler();
+      handler(updateTo);
     });
   }
 
   _generateMarkup() {
+    // console.log(this._data);
     return `
     <figure class="recipe__fig">
     <img src=${this._data.imageUrl} alt="Tomato" class="recipe__img" />
