@@ -625,7 +625,8 @@ const controlServings = function(newServings) {
     _modelJs.updateServings(newServings);
     // model.updateServings(model.state.recipe, newServings);
     //render new recipe view
-    (0, _recipeViewJsDefault.default).render(_modelJs.state.recipe);
+    // recipeView.render(model.state.recipe);
+    (0, _recipeViewJsDefault.default).update(_modelJs.state.recipe);
 };
 // showRecipe();
 // window.addEventListener('hashchange', showRecipe);
@@ -2053,22 +2054,14 @@ const loadRecipe = async function(id) {
         const { recipe  } = data.data;
         // console.log('star', recipe);
         state.recipe = {
-            // id: recipe.id,
-            // title: recipe.title,
-            // publisher: recipe.publisher,
-            // ingredients: recipe.ingredients,
-            // imageUrl: recipe.image_url,
-            // servings: recipe.servings,
-            // cookingTime: recipe.cooking_time,
-            // sourceUrl: recipe.source_url,
             id: recipe.id,
             title: recipe.title,
             publisher: recipe.publisher,
-            sourceUrl: recipe.source_url,
-            image: recipe.image_url,
+            ingredients: recipe.ingredients,
+            imageUrl: recipe.image_url,
             servings: recipe.servings,
             cookingTime: recipe.cooking_time,
-            ingredients: recipe.ingredients
+            sourceUrl: recipe.source_url
         };
         console.log("\uD83D\uDCA5\uD83D\uDD25\uD83D\uDCA5\uD83D\uDD25", state.recipe);
         console.log("♟♟", state.recipe.servings);
@@ -2104,28 +2097,17 @@ const getSearchPage = function(page = state.search.page) {
     return state.search.results.slice(start, end);
 };
 const updateServings = function(newServings) {
-    state.recipe.ingredients.forEach((ing)=>{
-        ing.quantity = ing.quantity * newServings / state.recipe.servings;
-    //newQty = oldQty * newQty/oldServings
-    });
-    console.log(state.recipe.servings);
-    state.recipe.servings = newServings;
-// const obj = {
-//   ...state.recipe,
-//   ingredients: state.recipe.ingredients.map(ing => ({
-//     ...ing,
-//     quantity: (ing.quantity * newServings) / state.recipe.servings,
-//   })),
-//   servings: newServings,
-// };
-// // obj.recipe.servings = newServings;
-// const updatedState = {
-//   ...state,
-//   recipe: obj,
-// };
-// console.log(obj);
-// return updatedState;
-//   // console.log(state.recipe.servings);
+    const scaleFactor = newServings / state.recipe.servings;
+    const updatedRecipe = {
+        ...state.recipe,
+        ingredients: state.recipe.ingredients.map((ing)=>({
+                ...ing,
+                quantity: ing.quantity * scaleFactor
+            })),
+        servings: newServings
+    };
+    if (!newServings) return;
+    state.recipe = updatedRecipe;
 };
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","regenerator-runtime":"dXNgZ","./config.js":"k5Hzs","./helpers.js":"hGI1E"}],"gkKU3":[function(require,module,exports) {
@@ -2829,14 +2811,11 @@ class RecipeView extends (0, _viewJsDefault.default) {
         this._parentElement.addEventListener("click", function(e) {
             const btn = e.target.closest(".btn--update-servings");
             if (!btn) return;
-            console.log(btn);
             const updateTo = +btn.dataset.updateTo;
-            console.log(updateTo);
-            handler(updateTo);
+            if (updateTo > 0) handler(updateTo);
         });
     }
     _generateMarkup() {
-        // console.log(this._data);
         return `
     <figure class="recipe__fig">
     <img src=${this._data.imageUrl} alt="Tomato" class="recipe__img" />
@@ -2921,7 +2900,7 @@ class RecipeView extends (0, _viewJsDefault.default) {
           </svg>
           <div class="recipe__quantity">${ing.quantity ? new (0, _fractional.Fraction)(ing.quantity).toString() : ""}</div>
           <div class="recipe__description">
-            <span class="recipe__unit">${ing.unit}</span>${ing.description}
+            <span class="recipe__unit">${ing.unit}</span> ${ing.description}
           </div>
         </li>
          `;
@@ -3233,6 +3212,34 @@ class View {
         const markup = this._generateMarkup();
         this._clear();
         this._parentElement.insertAdjacentHTML("afterbegin", markup);
+    }
+    update(data) {
+        this._data = data;
+        const newMarkup = this._generateMarkup;
+        const newDOM = document.createRange().createContextualFragment(newMarkup);
+        const newElements = Array.from(newDOM.querySelectorAll("*"));
+        const curElements = Array.from(this._parentElement.querySelectorAll("*"));
+        // console.log('🔥', newElements);
+        // console.log('💥', curElements);
+        newElements.forEach((newEl, i)=>{
+            const curEl = curElements[i];
+            console.log(!newEl.isEqualNode(curEl));
+            console.log(curEl);
+            // console.log(newEl.firstChild?.nodeValue.trim() !== '');
+            //updating texts
+            if (newEl.firstChild?.nodeValue.trim() !== "") console.log(newEl);
+        //   // console.log('💥', newEl.firstChild?.nodeValue.trim());
+        //   // console.log('🎉🎉', !newEl.isEqualNode(curEl));
+        //   console.log('💥', curEl);
+        //   console.log('🔥', newEl);
+        //   curEl.textContent = newEl.textContent;
+        // }
+        //updating changed attributes
+        // if (!newEl.isEqualNode(curEl)) console.log(newEl.atrributes);
+        // Array.from(newEl.attributes).forEach(attri =>
+        //   curEl.setAttributes(attri.name, attri.value)
+        // );
+        });
     }
     renderSpinner = function() {
         const markup = `

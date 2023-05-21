@@ -16,15 +16,13 @@ class RecipeView extends View {
     this._parentElement.addEventListener('click', function (e) {
       const btn = e.target.closest('.btn--update-servings');
       if (!btn) return;
-      console.log(btn);
+
       const updateTo = +btn.dataset.updateTo;
-      console.log(updateTo);
-      handler(updateTo);
+      if (updateTo > 0) handler(updateTo);
     });
   }
 
   _generateMarkup() {
-    // console.log(this._data);
     return `
     <figure class="recipe__fig">
     <img src=${this._data.imageUrl} alt="Tomato" class="recipe__img" />
@@ -121,7 +119,7 @@ class RecipeView extends View {
             ing.quantity ? new Fraction(ing.quantity).toString() : ''
           }</div>
           <div class="recipe__description">
-            <span class="recipe__unit">${ing.unit}</span>${ing.description}
+            <span class="recipe__unit">${ing.unit}</span> ${ing.description}
           </div>
         </li>
          `;

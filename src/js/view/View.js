@@ -11,6 +11,41 @@ export default class View {
     this._clear();
     this._parentElement.insertAdjacentHTML('afterbegin', markup);
   }
+  update(data) {
+    this._data = data;
+
+    const newMarkup = this._generateMarkup;
+    const newDOM = document.createRange().createContextualFragment(newMarkup);
+    const newElements = Array.from(newDOM.querySelectorAll('*'));
+    const curElements = Array.from(this._parentElement.querySelectorAll('*'));
+    // console.log('🔥', newElements);
+    // console.log('💥', curElements);
+
+    newElements.forEach((newEl, i) => {
+      const curEl = curElements[i];
+
+      console.log(!newEl.isEqualNode(curEl));
+      console.log(curEl);
+
+      // console.log(newEl.firstChild?.nodeValue.trim() !== '');
+      //updating texts
+      if (newEl.firstChild?.nodeValue.trim() !== '') {
+        console.log(newEl);
+        // curEl.textContent = newEl.textContent;
+      }
+      //   // console.log('💥', newEl.firstChild?.nodeValue.trim());
+      //   // console.log('🎉🎉', !newEl.isEqualNode(curEl));
+      //   console.log('💥', curEl);
+      //   console.log('🔥', newEl);
+      //   curEl.textContent = newEl.textContent;
+      // }
+      //updating changed attributes
+      // if (!newEl.isEqualNode(curEl)) console.log(newEl.atrributes);
+      // Array.from(newEl.attributes).forEach(attri =>
+      //   curEl.setAttributes(attri.name, attri.value)
+      // );
+    });
+  }
   renderSpinner = function () {
     const markup = `
           <svg>

@@ -20,25 +20,18 @@ export const loadRecipe = async function (id) {
     const { recipe } = data.data;
     // console.log('star', recipe);
     state.recipe = {
-      // id: recipe.id,
-      // title: recipe.title,
-      // publisher: recipe.publisher,
-      // ingredients: recipe.ingredients,
-      // imageUrl: recipe.image_url,
-      // servings: recipe.servings,
-      // cookingTime: recipe.cooking_time,
-      // sourceUrl: recipe.source_url,
       id: recipe.id,
       title: recipe.title,
       publisher: recipe.publisher,
-      sourceUrl: recipe.source_url,
-      image: recipe.image_url,
+      ingredients: recipe.ingredients,
+      imageUrl: recipe.image_url,
       servings: recipe.servings,
       cookingTime: recipe.cooking_time,
-      ingredients: recipe.ingredients,
+      sourceUrl: recipe.source_url,
     };
 
     console.log('💥🔥💥🔥', state.recipe);
+
     console.log('♟♟', state.recipe.servings);
     console.log('♟♟', state);
   } catch (err) {
@@ -76,27 +69,16 @@ export const getSearchPage = function (page = state.search.page) {
 };
 
 export const updateServings = function (newServings) {
-  state.recipe.ingredients.forEach(ing => {
-    ing.quantity = (ing.quantity * newServings) / state.recipe.servings;
-    //newQty = oldQty * newQty/oldServings
-  });
-  console.log(state.recipe.servings);
-  state.recipe.servings = newServings;
-  // const obj = {
-  //   ...state.recipe,
-  //   ingredients: state.recipe.ingredients.map(ing => ({
-  //     ...ing,
-  //     quantity: (ing.quantity * newServings) / state.recipe.servings,
-  //   })),
-  //   servings: newServings,
-  // };
-  // // obj.recipe.servings = newServings;
-  // const updatedState = {
-  //   ...state,
-  //   recipe: obj,
-  // };
+  const scaleFactor = newServings / state.recipe.servings;
+  const updatedRecipe = {
+    ...state.recipe,
+    ingredients: state.recipe.ingredients.map(ing => ({
+      ...ing,
+      quantity: ing.quantity * scaleFactor,
+    })),
+    servings: newServings,
+  };
 
-  // console.log(obj);
-  // return updatedState;
-  //   // console.log(state.recipe.servings);
+  if (!newServings) return;
+  state.recipe = updatedRecipe;
 };
